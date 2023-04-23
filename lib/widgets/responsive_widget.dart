@@ -20,7 +20,7 @@ class ResponsiveWidget extends StatelessWidget {
 
   static bool isMobile(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
-    return mediaQuery.size.width < 332;
+    return mediaQuery.size.width <= 332;
   }
 
   @override
