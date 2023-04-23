@@ -17,12 +17,12 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // for web
-  // await Firebase.initializeApp(
-  //   options: DefaultFirebaseOptions.currentPlatform,
-  // );
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   // for android & ios
-  await Firebase.initializeApp();
+  // await Firebase.initializeApp();
 
   // await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
   runApp(const MyApp());
