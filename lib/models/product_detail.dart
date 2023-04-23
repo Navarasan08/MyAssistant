@@ -184,7 +184,6 @@ class Field {
       this.createdAt,
       this.updatedAt}) {
     this.id = uuid.v1();
-    this.createdAt = DateTime.now().toString();
   }
 
   Field.fromJson(Map<String, dynamic> json) {
