@@ -1,0 +1,217 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:my_assistant/models/product_detail.dart';
+import 'package:my_assistant/service/firestore_service.dart';
+import 'package:my_assistant/utils/dialog.dart';
+import 'package:my_assistant/widgets/custom_button.dart';
+import 'package:my_assistant/widgets/responsive_widget.dart';
+
+class AddFieldPage extends StatefulWidget {
+  const AddFieldPage({
+    super.key,
+    required this.productId,
+    required this.fieldCount,
+    this.existFields,
+    this.rowId,
+  });
+
+  final String productId;
+  final int fieldCount;
+  final List<QueryDocumentSnapshot>? existFields;
+  final String? rowId;
+
+  @override
+  State<AddFieldPage> createState() => _AddFieldPageState();
+}
+
+class _AddFieldPageState extends State<AddFieldPage> {
+  Stream<QuerySnapshot>? headerStream;
+
+  var fieldList = [];
+  bool isAddOption = true;
+
+  @override
+  void initState() {
+    super.initState();
+
+    headerStream = FirestoreService.getProductHeaders(widget.productId)
+        .asBroadcastStream();
+
+    headerStream!.listen((headerSnapshot) {
+      var headers = headerSnapshot.docs;
+
+      headers.forEach((h) {
+        var header = h.data() as Map;
+
+        var controller = TextEditingController();
+
+        if (header['isAutoIncrement'] == "1") {
+          controller.text = "${widget.fieldCount + 1}";
+        }
+
+        if (widget.existFields != null) {
+          isAddOption = false;
+          QueryDocumentSnapshot _field = widget.existFields!.singleWhere(
+              (e) => (e.data() as Map<String, dynamic>)['headerId'] == h.id);
+
+          controller.text = (_field.data() as Map<String, dynamic>)['value'];
+        }
+
+        fieldList.add({
+          "controller": controller,
+          "header": header,
+          "headerId": h.id,
+        });
+
+        print(header);
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("${isAddOption ? 'Add' : 'Update'} Fields"),
+      ),
+      body: StreamBuilder<QuerySnapshot>(
+          stream: headerStream,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              var headers = snapshot.data!.docs;
+
+              return Center(
+                child: SizedBox(
+                  width: ResponsiveWidget.isWeb(context) ? size.width / 3 : size.width,
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: SingleChildScrollView(
+                          padding: const EdgeInsets.all(10.0),
+                          child: Column(children: [
+                            for (var header in headers) ...[
+                              if (header['fieldType'] == "date")
+                                TextFormField(
+                                  controller: fieldList.firstWhere((e) =>
+                                      e['header']['name'] ==
+                                      header['name'])['controller'],
+                                  keyboardType: header['fieldType'] == "int"
+                                      ? TextInputType.number
+                                      : null,
+                                  enabled: header['isAutoIncrement'] != "1",
+                                  decoration: InputDecoration(
+                                      labelText: header['name'],
+                                      suffixIcon: IconButton(
+                                          onPressed: () async {
+                                            DateTime? pickedDate =
+                                                await showDatePicker(
+                                                    context: context,
+                                                    initialDate: DateTime.now(),
+                                                    firstDate: DateTime(1950),
+                                                    lastDate: DateTime(2100));
+                
+                                            if (pickedDate != null) {
+                                              String formattedDate =
+                                                  DateFormat('yyyy-MM-dd')
+                                                      .format(pickedDate);
+                                              TextEditingController controller =
+                                                  fieldList.firstWhere((e) =>
+                                                      e['header']['name'] ==
+                                                      header['name'])['controller'];
+                                              setState(() {
+                                                controller.text = formattedDate;
+                                              });
+                                            } else {}
+                                          },
+                                          icon: Icon(Icons.calendar_month))),
+                                )
+                              else
+                                TextFormField(
+                                  controller: fieldList.firstWhere((e) =>
+                                      e['header']['name'] ==
+                                      header['name'])['controller'],
+                                  decoration:
+                                      InputDecoration(labelText: header['name']),
+                                ),
+                              SizedBox(height: 10),
+                            ]
+                          ]),
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      Center(
+                        child: CustomSubmitButton(
+                          onPressed: () async {
+                            try {
+                              DialogModel.showLoader(context);
+                      
+                              if (isAddOption) {
+                                List<Field> fields = [];
+                      
+                                fieldList.forEach((e) {
+                                  fields.add(Field(
+                                    headerId: e['headerId'],
+                                    headerName: e['header']['name'],
+                                    value: (e['controller'] as TextEditingController)
+                                        .text,
+                                    isActive: "1",
+                                    createdAt: DateTime.now().toString(),
+                                  ));
+                                });
+                      
+                                await FirestoreService.addFields(
+                                    widget.productId, fields);
+                              } else {
+                                await Future.forEach(widget.existFields!,
+                                    (field) async {
+                                  var _field = field.data() as Map<String, dynamic>;
+                      
+                                  var _newField = fieldList.firstWhere(
+                                      (e) => e['headerId'] == _field['headerId']);
+                      
+                                  var updateField = {
+                                    "value": (_newField['controller']
+                                            as TextEditingController)
+                                        .text,
+                                    "updatedAt": DateTime.now().toString(),
+                                  };
+                                  await FirestoreService.updateField(widget.productId,
+                                      widget.rowId!, field.id, updateField);
+                                });
+                              }
+                      
+                              DialogModel.hideLoader(context);
+                      
+                              Navigator.pop(context);
+                            } catch (e) {
+                              DialogModel.hideLoader(context);
+                              DialogModel.showSimpleDialog(context,
+                                  title: "Failure", msg: "$e");
+                            }
+                          },
+                          title: "Submit",
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                    ],
+                  ),
+                ),
+              );
+            }
+
+            if (snapshot.hasError) {
+              return Text("${snapshot.error}");
+            }
+
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }),
+    );
+  }
+}

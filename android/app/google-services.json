@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "606129913403",
+    "project_id": "my-assistant-ac985",
+    "storage_bucket": "my-assistant-ac985.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:606129913403:android:81bc6b9a802ed80975261e",
+        "android_client_info": {
+          "package_name": "com.example.my_assistant"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "606129913403-neu3gp2lkc78qvbjf6eqnkitrmstqrel.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBHDrGBUDuWPWlBDUsbpydyZohOVOnvAMw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "606129913403-neu3gp2lkc78qvbjf6eqnkitrmstqrel.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
