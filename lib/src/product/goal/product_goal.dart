@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:calendar_view/calendar_view.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:my_assistant/models/product.dart';
 import 'package:my_assistant/service/firestore_service.dart';
@@ -110,7 +111,7 @@ class _GoalPageState extends State<GoalPage> {
               icon: Icon(Icons.edit))
         ],
       ),
-      body: ResponsiveWidget.isMobile(context)
+      body: !kIsWeb
           ? _body()
           : Padding(
               padding: const EdgeInsets.all(15.0),
@@ -138,7 +139,7 @@ class _GoalPageState extends State<GoalPage> {
 
             return MonthView(
               controller: eventController,
-              cellAspectRatio: ResponsiveWidget.isMobile(context) ? 0.55 : 1.2,
+              cellAspectRatio: !kIsWeb ? 0.55 : 1.2,
               cellBuilder: (date, events, isToday, isInMonth) {
                 QueryDocumentSnapshot? _goalStatus = getGoalStatus(data, date);
                 GoalStatus? goalStatus = _goalStatus != null

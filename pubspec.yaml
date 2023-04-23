@@ -46,6 +46,20 @@ dev_dependencies:
   flutter_lints: ^2.0.0
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: "^0.13.1"
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/doge.jpeg"
+  min_sdk_android: 21 # android min sdk min:16, default 21
+  web:
+    generate: true
+  windows:
+    generate: true
+    icon_size: 48 # min:48, max:256, default: 48
+  macos:
+    generate: true
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -59,6 +73,7 @@ flutter:
   assets:
     - assets/images/tick.png
     - assets/images/fail.png
+    - assets/images/doge.jpeg
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg
