@@ -23,6 +23,22 @@ class _ProductTablePageState extends State<ProductTablePage> {
   Stream<QuerySnapshot>? rowStream;
   int fieldCount = 0;
 
+  List<QueryDocumentSnapshot> headers = [];
+
+  String? sortHeaderName;
+
+  void changeSort(String name) {
+    setState(() {
+      if (name == sortHeaderName) {
+        sortHeaderName = null;
+        // rowStream = FirestoreService.getRows("${widget.product.id}", orderBy: name, isDesc: false).asBroadcastStream();
+      } else {
+        sortHeaderName = name;
+        // rowStream = FirestoreService.getRows("${widget.product.id}", orderBy: name, isDesc: true).asBroadcastStream();
+      }
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -55,7 +71,7 @@ class _ProductTablePageState extends State<ProductTablePage> {
           stream: headerStream,
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              var headers = snapshot.data!.docs;
+              headers = snapshot.data!.docs;
 
               if (headers.isEmpty) {
                 return Center(
@@ -100,13 +116,26 @@ class _ProductTablePageState extends State<ProductTablePage> {
       children: [
         for (var header in headers)
           Expanded(
-              child: Center(
-            child: Text(
-              header['name'],
-              style: TextStyle(fontWeight: FontWeight.w600),
-              overflow: TextOverflow.ellipsis,
-            ),
-          )),
+              flex: header['isAutoIncrement'] == "1" ? 1 : 3,
+              child: GestureDetector(
+                  onTap: () {
+                    changeSort(header['name']);
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          header['name'],
+                          style: TextStyle(fontWeight: FontWeight.w600),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      Icon(sortHeaderName == header['name']
+                          ? Icons.arrow_drop_up
+                          : Icons.arrow_drop_down),
+                    ],
+                  ))),
         PopupMenuButton(
           padding: EdgeInsets.zero,
           constraints: BoxConstraints(),
@@ -154,67 +183,132 @@ class _ProductTablePageState extends State<ProductTablePage> {
   }
 
   Widget _buildField(QueryDocumentSnapshot row) {
-    return StreamBuilder<QuerySnapshot>(
-        stream: FirestoreService.getFields(widget.product.id!, row.id),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            var fields = snapshot.data!.docs;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        children: [
+          for (var header in headers)
+            StreamBuilder<QuerySnapshot>(
+                stream: FirestoreService.getField(
+                    widget.product.id!, row.id, header.id),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    var list = snapshot.data?.docs;
 
-            return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4.0),
-              child: Row(
-                children: [
-                  for (var field in fields)
-                    Expanded(child: Center(child: Text(field['value']))),
-                  PopupMenuButton(
-                    padding: EdgeInsets.zero,
-                    constraints: BoxConstraints(),
-                    onSelected: (value) {
-                      if (value == "edit") {
-                        context.pushRoute(AddFieldPage(
-                          productId: widget.product.id!,
-                          fieldCount: fieldCount,
-                          existFields: fields,
-                          rowId: row.id,
-                        ));
-                      }
+                    if (list != null && list.isNotEmpty) {
+                      var obj = list.first.data() as Map<String, dynamic>;
 
-                      if (value == "delete") {
-                        DialogModel.showSimpleDialog(context,
-                            title: "Delete",
-                            msg: "Are you sure to delete the Field", onTap: () {
-                          FirestoreService.deleteRow(
-                              widget.product.id!, row.id);
-                        });
-                      }
-                    },
-                    itemBuilder: (BuildContext bc) {
-                      return const [
-                        PopupMenuItem(
-                          child: Text("Edit Field"),
-                          value: 'edit',
-                        ),
-                        PopupMenuItem(
-                          child: Text("Delete"),
-                          value: 'delete',
-                        ),
-                      ];
-                    },
-                  )
-                ],
-              ),
-            );
-          }
+                      Field field = Field.fromJson(obj);
 
-          if (snapshot.hasError) {
-            return Center(
-              child: Text("${snapshot.error}"),
-            );
-          }
+                      return Expanded(
+                          flex: header['isAutoIncrement'] == "1" ? 1 : 3,
+                          child: Center(child: Text("${field.value}")));
+                    }
+                  }
 
-          return Center(
-            child: CircularProgressIndicator(),
-          );
-        });
+                  return Container();
+                }),
+          PopupMenuButton(
+            padding: EdgeInsets.zero,
+            constraints: BoxConstraints(),
+            onSelected: (value) {
+              if (value == "edit") {
+                context.pushRoute(AddFieldPage(
+                  productId: widget.product.id!,
+                  fieldCount: fieldCount,
+                  rowId: row.id,
+                  isAddOption: false,
+                ));
+              }
+
+              if (value == "delete") {
+                DialogModel.showSimpleDialog(context,
+                    title: "Delete",
+                    msg: "Are you sure to delete the Field", onTap: () {
+                  FirestoreService.deleteRow(widget.product.id!, row.id);
+                });
+              }
+            },
+            itemBuilder: (BuildContext bc) {
+              return const [
+                PopupMenuItem(
+                  child: Text("Edit Field"),
+                  value: 'edit',
+                ),
+                PopupMenuItem(
+                  child: Text("Delete"),
+                  value: 'delete',
+                ),
+              ];
+            },
+          )
+        ],
+      ),
+    );
   }
+
+  // Widget _buildField(QueryDocumentSnapshot row) {
+  //   return StreamBuilder<QuerySnapshot>(
+  //       stream: FirestoreService.getFields(widget.product.id!, row.id),
+  //       builder: (context, snapshot) {
+  //         if (snapshot.hasData) {
+  //           var fields = snapshot.data!.docs;
+
+  //           return Padding(
+  //             padding: const EdgeInsets.symmetric(vertical: 4.0),
+  //             child: Row(
+  //               children: [
+  //                 for (var field in fields)
+  //                   Expanded(child: Center(child: Text(field['value']))),
+  //                 PopupMenuButton(
+  //                   padding: EdgeInsets.zero,
+  //                   constraints: BoxConstraints(),
+  //                   onSelected: (value) {
+  //                     if (value == "edit") {
+  //                       context.pushRoute(AddFieldPage(
+  //                         productId: widget.product.id!,
+  //                         fieldCount: fieldCount,
+  //                         existFields: fields,
+  //                         rowId: row.id,
+  //                       ));
+  //                     }
+
+  //                     if (value == "delete") {
+  //                       DialogModel.showSimpleDialog(context,
+  //                           title: "Delete",
+  //                           msg: "Are you sure to delete the Field", onTap: () {
+  //                         FirestoreService.deleteRow(
+  //                             widget.product.id!, row.id);
+  //                       });
+  //                     }
+  //                   },
+  //                   itemBuilder: (BuildContext bc) {
+  //                     return const [
+  //                       PopupMenuItem(
+  //                         child: Text("Edit Field"),
+  //                         value: 'edit',
+  //                       ),
+  //                       PopupMenuItem(
+  //                         child: Text("Delete"),
+  //                         value: 'delete',
+  //                       ),
+  //                     ];
+  //                   },
+  //                 )
+  //               ],
+  //             ),
+  //           );
+  //         }
+
+  //         if (snapshot.hasError) {
+  //           return Center(
+  //             child: Text("${snapshot.error}"),
+  //           );
+  //         }
+
+  //         return Center(
+  //           child: CircularProgressIndicator(),
+  //         );
+  //       });
+  // }
 }

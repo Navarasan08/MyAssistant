@@ -243,14 +243,14 @@ class FirestoreService {
   }
 
   // get Rows : pId
-  static Stream<QuerySnapshot> getRows(String pId) async* {
+  static Stream<QuerySnapshot> getRows(String pId,{ bool isDesc = false , String? orderBy}) async* {
     CollectionReference productCollection = firestore.collection('product');
     try {
       yield* productCollection
           .doc(pId)
           .collection("rows")
-          .where('isActive', isEqualTo: '1')
-          .orderBy('createdAt')
+          // .where('isActive', isEqualTo: '1')
+          .orderBy( orderBy ?? 'createdAt', descending: isDesc)
           .snapshots();
     } catch (e) {
       throw "$e";
@@ -282,6 +282,21 @@ class FirestoreService {
           .collection("fields")
           .orderBy('createdAt')
           .snapshots();
+    } catch (e) {
+      throw "$e";
+    }
+  }
+
+    // get field based on row & header
+  static Stream<QuerySnapshot> getField(String pId, String rowId, String headerId) async* {
+    CollectionReference productCollection = firestore.collection('product');
+    try {
+      yield* productCollection
+          .doc(pId)
+          .collection("rows")
+          .doc(rowId)
+          .collection("fields")
+          .where("headerId", isEqualTo: headerId).snapshots();
     } catch (e) {
       throw "$e";
     }

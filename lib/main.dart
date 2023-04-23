@@ -1,9 +1,11 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_assistant/firebase_options.dart';
+import 'package:my_assistant/service/firestore_service.dart';
 import 'package:my_assistant/src/splash_screen.dart';
 import 'package:uuid/uuid.dart';
 
@@ -15,12 +17,12 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // for web
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  // await Firebase.initializeApp(
+  //   options: DefaultFirebaseOptions.currentPlatform,
+  // );
 
   // for android & ios
-  // await Firebase.initializeApp();
+  await Firebase.initializeApp();
 
   // await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
   runApp(const MyApp());
