@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_assistant/firebase_options.dart';
@@ -16,13 +17,19 @@ var uuid = Uuid();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // for web
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  try {
+    if (kIsWeb) {
+      print("web");
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+    } else {
+      // for android & ios
+      await Firebase.initializeApp();
+    }
 
-  // for android & ios
-  // await Firebase.initializeApp();
+    // for web
+  } catch (e) {}
 
   // await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
   runApp(const MyApp());
