@@ -2,8 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_assistant/cubit/auth_navigation_cubit.dart';
+import 'package:my_assistant/dashboard/ui/dashbaord_screen.dart';
 import 'package:my_assistant/service/firebase_service.dart';
-import 'package:my_assistant/src/home/ui/home_screen.dart';
 import 'package:my_assistant/utils/dialog.dart';
 import 'package:my_assistant/utils/validator.dart';
 import 'package:my_assistant/widgets/custom_button.dart';
@@ -39,7 +39,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             email: _emailC.text, password: _passwordC.text, name: _name.text);
         // setLoading(false);
         Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => HomeScreen()));
+            context, MaterialPageRoute(builder: (context) => DashbaordScreen()));
       } catch (error) {
         setLoading(false);
         DialogModel.showSimpleDialog(context, title: "Failed", msg: "$error");

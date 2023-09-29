@@ -1,11 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:my_assistant/utils/colors.dart';
 
 class AppConstants {
   AppConstants._();
-  
+
   static const List<String> viewMode = ["Table", "List", "Goal"];
   static const List<String> fieldType = ["String", "int", "date"];
+  static const List<Map> templateType = [
+    {
+      "title": "automobile",
+      "icons": [
+        "bike",
+        "car",
+      ],
+    },
+    {
+      "title": "notes",
+      "icons": [],
+    },
+    {
+      "title": "checklist",
+      "icons": [
+        "noteCheckOutline",
+        "notebookEditOutline",
+        "notebookMultiple",
+        "notebookPlusOutline"
+      ],
+    },
+    {
+      "title": "expense",
+      "icons": [],
+    },
+  ];
 
   static const String initialViewMode = "Table";
   static const String initialFieldType = "String";

@@ -1,7 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:my_assistant/dashboard/ui/dashbaord_screen.dart';
 import 'package:my_assistant/src/auth/ui/login_screen.dart';
-import 'package:my_assistant/src/home/ui/home_screen.dart';
+
+
 
 class MySplashScreen extends StatefulWidget {
   const MySplashScreen({super.key});
@@ -15,15 +17,15 @@ class _MySplashScreenState extends State<MySplashScreen> {
   void initState() {
     super.initState();
 
-   checkUser().then((User? user) {
+    checkUser().then((User? user) {
       if (user == null) {
         print('User is currently signed out!');
         Navigator.pushReplacement(
             context, MaterialPageRoute(builder: (context) => LoginScreen()));
       } else {
         print('User is signed in!');
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => HomeScreen()));
+        Navigator.pushReplacement(context,
+            MaterialPageRoute(builder: (context) => DashbaordScreen()));
       }
     });
   }

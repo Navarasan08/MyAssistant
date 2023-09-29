@@ -51,7 +51,7 @@ class MyApp extends StatelessWidget {
         title: 'My Assistant',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
-          scaffoldBackgroundColor: Colors.white,
+          scaffoldBackgroundColor: Color.fromARGB(255, 240, 238, 240),
           inputDecorationTheme: InputDecorationTheme(
             border: OutlineInputBorder(),
             contentPadding: EdgeInsets.symmetric(
@@ -64,7 +64,7 @@ class MyApp extends StatelessWidget {
                   fontSize: 19,
                   fontWeight: FontWeight.w600,
                   color: Colors.white)),
-          primarySwatch: Colors.cyan,
+          primarySwatch: Colors.deepPurple,
         ),
         home: MySplashScreen(),
       ),

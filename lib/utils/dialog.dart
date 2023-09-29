@@ -22,8 +22,8 @@ class DialogModel {
 
   static void showSnackBar(BuildContext context, String msg) {
     ScaffoldMessenger.of(context)
-    ..hideCurrentSnackBar()
-    ..showSnackBar(SnackBar(content: Text(msg)));
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(msg)));
   }
 
   static void showLoader(BuildContext context) {
@@ -36,9 +36,9 @@ class DialogModel {
           content: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-               CircularProgressIndicator(),
-               SizedBox(width: 8),
-               Text("Loading"),
+              CircularProgressIndicator(),
+              SizedBox(width: 8),
+              Text("Loading"),
             ],
           ),
         );
@@ -49,4 +49,5 @@ class DialogModel {
   static void hideLoader(BuildContext context) {
     Navigator.pop(context);
   }
+
 }

@@ -5,9 +5,9 @@ import 'package:my_assistant/cubit/auth_navigation_cubit.dart';
 import 'package:my_assistant/service/firebase_service.dart';
 import 'package:my_assistant/src/auth/ui/auth_screen_web.dart';
 import 'package:my_assistant/src/auth/ui/signup_screen.dart';
-import 'package:my_assistant/src/home/ui/home_screen.dart';
 import 'package:my_assistant/utils/dialog.dart';
 import 'package:my_assistant/utils/validator.dart';
+import 'package:my_assistant/dashboard/ui/dashbaord_screen.dart';
 import 'package:my_assistant/widgets/custom_button.dart';
 import 'package:my_assistant/widgets/responsive_widget.dart';
 
@@ -49,7 +49,7 @@ class _LoginPageState extends State<LoginPage> {
             await FirebaseService.signIn(_emailC.text, _passwordC.text);
         // setLoading(false);
         Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => HomeScreen()));
+            context, MaterialPageRoute(builder: (context) => DashbaordScreen()));
       } catch (error) {
         setLoading(false);
         DialogModel.showSimpleDialog(context, title: "Failed", msg: "$error");
